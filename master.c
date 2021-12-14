@@ -51,40 +51,23 @@ int main(){
 	pid_t pid_circb;
 	pid_t pid_master;
 
+	int fd_time0;
+	int fd_time1;
+
+	time_t seconds0;
+    time_t seconds1;
+	time_t tot;
+
     // Getting the pid's master to "fprintf" it in the log file
 
 	pid_master=getpid();
 
-    // We had put this structure code just to avoid pressing 
-	// "Enter" every time we want to increase/decrease x and z of our joist
-	// The tcgetattr() function will get the parameters associated with 
-    // the terminal referred to by the first argument and store them in 
-    // the termios structure referenced by the second argument.
-
-	static struct termios oldt;
-
-	void restore_terminal_settings(void){
-
-		tcsetattr(0, TCSANOW, &oldt);  // Apply saved settings. 
-	}
-
-	void disable_waiting_for_enter(void){
-
-		struct termios newt;
-
-		// Make terminal read 1 char at a time.
-
-		tcgetattr(0, &oldt);  
-		newt = oldt;  
-		newt.c_lflag &= ~(ICANON | ECHO); 
-		tcsetattr(0, TCSANOW, &newt);  
-		atexit(restore_terminal_settings);  
-	}
-
-    disable_waiting_for_enter();
 
 	mkfifo("/tmp/np", 0666);
-	char *arg_list_np] = { "./np", "/tmp/np", NULL };
+	mkfifo("/tmp/time0", 0666);
+	mkfifo("/tmp/time1", 0666);
+	char *arg_list_np[] = { "./np", "/tmp/np", "/tmp/time0",  "/tmp/time1", NULL };
+	char *arg_list_up[] = { "./up", "/tmp/time0",  "/tmp/time1", NULL };
 
     printf("chose which IPC you want to use\n");
     printf("press U for unnamed pipe\n");
@@ -100,26 +83,40 @@ int main(){
 
             case 117:
                 pid_unpipe = spawn ("./up", arg_list_up);
-                
-                c = getchar();
+                fd_time0 = open("/tmp/time0", O_RDONLY);
+				read(fd_time0, &seconds0, sizeof(seconds0));
+				fd_time1 = open("/tmp/time1", O_RDONLY);
+				read(fd_time1, &seconds1, sizeof(seconds1));
+				tot = seconds1 - seconds0;
+				printf("Time of execution : %ld\n", tot);
+                fflush(stdout);
             break;
 
             case 110:
                 pid_npipe = spawn ("./np", arg_list_np);
-                c = getchar();
+				fd_time0 = open("/tmp/time0", O_RDONLY);
+				read(fd_time0, &seconds0, sizeof(seconds0));
+				fd_time1 = open("/tmp/time1", O_RDONLY);
+				read(fd_time1, &seconds1, sizeof(seconds1));
+				tot = seconds1 - seconds0;
+				printf("Time of execution : %ld\n", tot);
+				fflush(stdout);
+                
             break;
 
             case 115:
-                pid_socket = spawn ("./sck", arg_list_sck);
+                //pid_socket = spawn ("./sck", arg_list_sck);
                 c = getchar();
             break;
 
             case 99:
-                pid_circb = spawn ("./cb", arg_list_cb);
+                //pid_circb = spawn ("./cb", arg_list_cb);
                 c = getchar();
             break;
         }
+		c = getchar();
+	}
 
-
+return 0;
 
 }
