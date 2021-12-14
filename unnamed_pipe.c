@@ -40,18 +40,16 @@ int main(int argc, char* argv[]){
 
     int id = fork();
 
-    if (id == 0){
+    if (id != 0){
 
         printf("Producer!\n");
 
         int A[num];
-        printf("aaa");
         for(int i = 0; i < num; i++){
 
             A[i] = 1 + rand()%100;
 
         }
-        printf("aaa");
         fd_time0 = open(argv[1], O_WRONLY);
 
         time(&seconds0);
@@ -87,7 +85,6 @@ int main(int argc, char* argv[]){
         write(fd_time1, &seconds1, sizeof(seconds1));
 
     }
-
     close(fd_time0);
     close(fd_time1);
 

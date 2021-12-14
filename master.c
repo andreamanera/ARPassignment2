@@ -68,6 +68,7 @@ int main(){
 	mkfifo("/tmp/time1", 0666);
 	char *arg_list_np[] = { "./np", "/tmp/np", "/tmp/time0",  "/tmp/time1", NULL };
 	char *arg_list_up[] = { "./up", "/tmp/time0",  "/tmp/time1", NULL };
+	char *arg_list_sck[] = { "./sck", "/tmp/time0",  "/tmp/time1", NULL };
 
     printf("chose which IPC you want to use\n");
     printf("press U for unnamed pipe\n");
@@ -105,8 +106,15 @@ int main(){
             break;
 
             case 115:
-                //pid_socket = spawn ("./sck", arg_list_sck);
-                c = getchar();
+                pid_socket = spawn ("./sck", arg_list_sck);
+				fd_time0 = open("/tmp/time0", O_RDONLY);
+				read(fd_time0, &seconds0, sizeof(seconds0));
+				fd_time1 = open("/tmp/time1", O_RDONLY);
+				read(fd_time1, &seconds1, sizeof(seconds1));
+				tot = seconds1 - seconds0;
+				printf("Time of execution : %ld\n", tot);
+				fflush(stdout);
+               
             break;
 
             case 99:

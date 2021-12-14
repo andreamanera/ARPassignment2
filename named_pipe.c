@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
         exit(1);
     }
 
-    if (id == 0){
+    if (id != 0){
 
         printf("Producer!\n");
 
