@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <strings.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <termios.h>
@@ -22,9 +23,9 @@ void error(char *msg){
 
 int main(int argc, char* argv[]){
 
-    int fd_np;
     int fd_time0;
     int fd_time1;
+
     int sockfd;
     int newsockfd;
     int portno;
@@ -87,17 +88,23 @@ int main(int argc, char* argv[]){
 
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-        if(sockfd < 0)
-            error("Error opening socket");
+        if(sockfd < 0){
 
-        portno = atoi(argv[1]);
+            error("Error opening socket");
+        }
+
+        bzero((char *) &serv_addr, sizeof(serv_addr));
+
+        portno = 51717;
 
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_port = htons(portno);
         serv_addr.sin_addr.s_addr = INADDR_ANY;
 
-        if(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+        if(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
+
             error("Error on binding");
+        }
 
         listen(sockfd, 5);
 
@@ -105,8 +112,10 @@ int main(int argc, char* argv[]){
 
         newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 
-        if (newsockfd < 0)
+        if (newsockfd < 0){
+
             error("Error on accept");
+        }
 
         for(int i = 0; i < num; i++){
 
@@ -124,17 +133,18 @@ int main(int argc, char* argv[]){
 
         if (argc < 3) {
 
-            fprintf(stderr,"usage %s hostname port\n", argv[0]);
             exit(0);
         }
 
-        portno = atoi(argv[2]);
+        portno = 51717;
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-        if (sockfd < 0) 
-            error("ERROR opening socket");
+        if (sockfd < 0){
 
-        server = gethostbyname(argv[1]);
+            error("ERROR opening socket");
+        }
+        
+        server = gethostbyname("localhost");
 
         if (server == NULL) {
 
@@ -142,15 +152,18 @@ int main(int argc, char* argv[]){
             exit(0);
         }
 
+        bzero((char *) &serv_addr, sizeof(serv_addr));
         serv_addr.sin_family = AF_INET;
         bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
 
         serv_addr.sin_port = htons(portno);
 
-        bcopy( char *s1, char *s2, int length);
-
-        if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) 
+        if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0){
+        
             error("ERROR connecting");
+        }
+
+        bzero(B, num);
 
         for(int i = 0; i < num; i++){
 
