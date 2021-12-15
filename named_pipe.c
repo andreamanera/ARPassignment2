@@ -11,6 +11,8 @@
 #include <time.h>
 #include <termios.h>
 
+#define SIZE 2000000
+
 int main(int argc, char* argv[]){
 
     int fd_np;
@@ -47,9 +49,11 @@ int main(int argc, char* argv[]){
 
         printf("Producer!\n");
 
-        int A[num];
+        //maximum size of array that can occupy memory without segmentation fault
 
-        for(int i = 0; i < num; i++){
+        int A[SIZE];
+
+        for(int i = 0; i < SIZE; i++){
 
             A[i] = 1 + rand()%100;
 
@@ -67,9 +71,11 @@ int main(int argc, char* argv[]){
         
         printf("Time 0 : %ld\n", seconds0);
 
-        for(int i = 0; i < num; i++){
+        
 
-            write(fd_np, &A[i], sizeof(A[i]));
+        for(int i = 0; i < num ; i++){
+
+            write(fd_np, &A[i%SIZE], sizeof(A[i%SIZE]));
         }
     }
 
@@ -81,11 +87,11 @@ int main(int argc, char* argv[]){
 
         fd_time1 = open(argv[3], O_WRONLY);
 
-        int B[num];
+        int B[SIZE];
                     
         for(int i = 0; i < num; i++){
 
-            read(fd_np, &B[i], sizeof(B[i]));
+            read(fd_np, &B[i%SIZE], sizeof(B[i%SIZE]));
 
         }
 

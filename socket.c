@@ -15,6 +15,8 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#define SIZE 2000000
+
 void error(char *msg){
 
     perror(msg);
@@ -64,9 +66,9 @@ int main(int argc, char* argv[]){
 
         printf("Server!\n");
 
-        int A[num];
+        int A[SIZE];
 
-        for(int i = 0; i < num; i++){
+        for(int i = 0; i < SIZE; i++){
 
             A[i] = 1 + rand()%100;
 
@@ -119,7 +121,7 @@ int main(int argc, char* argv[]){
 
         for(int i = 0; i < num; i++){
 
-            write(newsockfd, &A[i], sizeof(int));
+            write(newsockfd, &A[i%SIZE], sizeof(A[i%SIZE]));
         }
     }
 
@@ -129,7 +131,7 @@ int main(int argc, char* argv[]){
 
         fd_time1 = open(argv[2], O_WRONLY);
 
-        int B[num];
+        int B[SIZE];
 
         if (argc < 3) {
 
@@ -163,11 +165,11 @@ int main(int argc, char* argv[]){
             error("ERROR connecting");
         }
 
-        bzero(B, num);
+        bzero(B, SIZE);
 
         for(int i = 0; i < num; i++){
 
-            read(sockfd, &B[i], sizeof(int));
+            read(sockfd, &B[i%SIZE], sizeof(B[i%SIZE]));
         }
 
         time(&seconds1);
@@ -192,6 +194,7 @@ int main(int argc, char* argv[]){
 
 
         
+
 
 
 

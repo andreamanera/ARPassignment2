@@ -11,6 +11,8 @@
 #include <time.h>
 #include <termios.h>
 
+#define SIZE 2000000
+
 int main(int argc, char* argv[]){
 
     int fd_time0;
@@ -44,8 +46,8 @@ int main(int argc, char* argv[]){
 
         printf("Producer!\n");
 
-        int A[num];
-        for(int i = 0; i < num; i++){
+        int A[SIZE];
+        for(int i = 0; i < SIZE; i++){
 
             A[i] = 1 + rand()%100;
 
@@ -60,7 +62,7 @@ int main(int argc, char* argv[]){
 
         for(int i = 0; i < num; i++){
 
-            write(p[1], &A[i], sizeof(A[i]));
+            write(p[1], &A[i%SIZE], sizeof(A[i%SIZE]));
         }
     }
 
@@ -70,11 +72,11 @@ int main(int argc, char* argv[]){
 
         fd_time1 = open(argv[2], O_WRONLY);
 
-        int B[num];
+        int B[SIZE];
                     
         for(int i = 0; i < num; i++){
 
-            read(p[0], &B[i], sizeof(B[i]));
+            read(p[0], &B[i%SIZE], sizeof(B[i%SIZE]));
 
         }
 
