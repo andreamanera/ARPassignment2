@@ -10,6 +10,10 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <termios.h>
+#include <strings.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
 
 int spawn(const char * program, char ** arg_list) {
 
@@ -76,8 +80,8 @@ int main(){
     printf("press S for socket\n");
     printf("press C for circular buffer\n");
 
-    char c = getchar();
-
+	char c= getchar();
+	 
     while (c != 'e'){
 
         switch(c){
@@ -121,10 +125,14 @@ int main(){
                 //pid_circb = spawn ("./cb", arg_list_cb);
                 c = getchar();
             break;
-        }
-		c = getchar();
+
+			default: 
+				printf("Wrong command!\n");
+			break;
+		}
 	}
 
 return 0;
 
 }
+
