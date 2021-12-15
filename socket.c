@@ -14,6 +14,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 
 #define SIZE 2000000
 
@@ -95,17 +96,35 @@ int main(int argc, char* argv[]){
             error("Error opening socket");
         }
 
+        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0){
+            
+            error("setsockopt(SO_REUSEADDR) failed");
+        }
+
         bzero((char *) &serv_addr, sizeof(serv_addr));
 
-        portno = 51717;
+        portno = 8080;
 
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_port = htons(portno);
         serv_addr.sin_addr.s_addr = INADDR_ANY;
 
+        int reuse = 1;
+        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)) < 0){
+
+            perror("setsockopt(SO_REUSEADDR) failed");
+        }
+
+        #ifdef SO_REUSEPORT
+            if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, (const char*)&reuse, sizeof(reuse)) < 0){
+
+                perror("setsockopt(SO_REUSEPORT) failed");
+            }
+        #endif
+
         if(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
 
-            error("Error on binding");
+            error("Error on binding\n");
         }
 
         listen(sockfd, 5);
@@ -138,7 +157,7 @@ int main(int argc, char* argv[]){
             exit(0);
         }
 
-        portno = 51717;
+        portno = 8080;
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
         if (sockfd < 0){
@@ -146,7 +165,7 @@ int main(int argc, char* argv[]){
             error("ERROR opening socket");
         }
         
-        server = gethostbyname("localhost");
+        server = gethostbyname("127.0.0.1");
 
         if (server == NULL) {
 
@@ -159,11 +178,6 @@ int main(int argc, char* argv[]){
         bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
 
         serv_addr.sin_port = htons(portno);
-
-        if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0){
-        
-            error("ERROR connecting");
-        }
 
         bzero(B, SIZE);
 

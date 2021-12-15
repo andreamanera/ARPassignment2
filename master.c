@@ -6,14 +6,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <signal.h>
+#include <strings.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <termios.h>
-#include <strings.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 
 int spawn(const char * program, char ** arg_list) {
 
@@ -125,11 +126,9 @@ int main(){
                 //pid_circb = spawn ("./cb", arg_list_cb);
                 c = getchar();
             break;
-
-			default: 
-				printf("Wrong command!\n");
-			break;
 		}
+
+		c = getchar();
 	}
 
 return 0;
