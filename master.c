@@ -74,6 +74,8 @@ int main(){
 	char *arg_list_np[] = { "./np", "/tmp/np", "/tmp/time0",  "/tmp/time1", NULL };
 	char *arg_list_up[] = { "./up", "/tmp/time0",  "/tmp/time1", NULL };
 	char *arg_list_sck[] = { "./sck", "/tmp/time0",  "/tmp/time1", NULL };
+	char *arg_list_cb[] = { "./cb", "/tmp/time0",  "/tmp/time1", NULL };
+
 
 	char c;
 	 
@@ -126,7 +128,14 @@ int main(){
             break;
 
             case 99:
-                //pid_circb = spawn ("./cb", arg_list_cb);
+                pid_circb = spawn ("./cb", arg_list_cb);
+				fd_time0 = open("/tmp/time0", O_RDONLY);
+				read(fd_time0, &seconds0, sizeof(seconds0));
+				fd_time1 = open("/tmp/time1", O_RDONLY);
+				read(fd_time1, &seconds1, sizeof(seconds1));
+				tot = seconds1 - seconds0;
+				printf("Time of execution : %f\n", tot);
+				fflush(stdout);
 
             break;
 		}
