@@ -18,24 +18,24 @@ int main(int argc, char* argv[]){
     int fd_np;
     int fd_time0;
     int fd_time1;
-    time_t seconds0;
-    time_t seconds1;
+    clock_t seconds0;
+    clock_t seconds1;
 
-    printf("Insert number of elements of the array\n");
+    printf("Insert size of the array (in kB), max size is 100000 kB\n");
 
-    int num;
+    int kBsize;
 
-    scanf("%d", & num);
+    scanf("%d", & kBsize);
 
-    if (num > 25000000){
+    while (kBsize > 100000){
 
-        printf("Insert a number smaller than 25000000");
+        printf("Insert a number smaller than 100");
 
-        scanf("%d", & num);
-
-
+        scanf("%d", & kBsize);
 
     }
+
+    int num = kBsize / 0.004;
 
     int id = fork();
 
@@ -65,13 +65,13 @@ int main(int argc, char* argv[]){
 
         // Stores time seconds
 
-        time(&seconds0);
+        seconds0 = clock();
 
-        write(fd_time0, &seconds0, sizeof(seconds0));
-        
-        printf("Time 0 : %ld\n", seconds0);
+        double time_taken0 =(double) seconds0 / CLOCKS_PER_SEC;
 
+        write(fd_time0, &time_taken0, sizeof(time_taken0));
         
+        printf("Time 0 : %f\n", time_taken0);
 
         for(int i = 0; i < num ; i++){
 
@@ -97,11 +97,13 @@ int main(int argc, char* argv[]){
 
         // Stores time seconds
 
-        time(&seconds1);
+        seconds1 = clock();
 
-        printf("Time 1 : %ld\n", seconds1);
+        double time_taken1 = (double) seconds1 / CLOCKS_PER_SEC;
 
-        write(fd_time1, &seconds1, sizeof(seconds1));
+        printf("Time 1 : %f\n", time_taken1);
+
+        write(fd_time1, &time_taken1, sizeof(time_taken1));
         
         
 

@@ -59,9 +59,9 @@ int main(){
 	int fd_time0;
 	int fd_time1;
 
-	time_t seconds0;
-    time_t seconds1;
-	time_t tot;
+	double seconds0;
+    double seconds1;
+	double tot;
 
     // Getting the pid's master to "fprintf" it in the log file
 
@@ -75,15 +75,18 @@ int main(){
 	char *arg_list_up[] = { "./up", "/tmp/time0",  "/tmp/time1", NULL };
 	char *arg_list_sck[] = { "./sck", "/tmp/time0",  "/tmp/time1", NULL };
 
-    printf("chose which IPC you want to use\n");
-    printf("press U for unnamed pipe\n");
-    printf("press N for named pipe\n");
-    printf("press S for socket\n");
-    printf("press C for circular buffer\n");
-
-	char c= getchar();
+	char c;
 	 
     while (c != 'e'){
+
+		printf("chose which IPC you want to use\n");
+		printf("press U for unnamed pipe\n");
+		printf("press N for named pipe\n");
+		printf("press S for socket\n");
+		printf("press C for circular buffer\n");
+
+		c = getchar();
+		getchar();
 
         switch(c){
 
@@ -94,7 +97,7 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf("Time of execution : %ld\n", tot);
+				printf("Time of execution : %f\n", tot);
                 fflush(stdout);
             break;
 
@@ -105,7 +108,7 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf("Time of execution : %ld\n", tot);
+				printf("Time of execution : %f\n", tot);
 				fflush(stdout);
                 
             break;
@@ -117,18 +120,18 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf("Time of execution : %ld\n", tot);
+				printf("Time of execution : %f\n", tot);
 				fflush(stdout);
                
             break;
 
             case 99:
                 //pid_circb = spawn ("./cb", arg_list_cb);
-                c = getchar();
+
             break;
 		}
 
-		c = getchar();
+		
 	}
 
 return 0;
