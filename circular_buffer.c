@@ -62,17 +62,19 @@ int main(int argc, char* argv[]){
 
     sem_init(&not_empty, 1, 0);
 
+    
+
+    const char * shm_name = "/AOS";
+
+    int shm_fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+
     int id = fork();
 
     if(id != 0){
 
-        const char * shm_name = "/AOS";
+        int i;
 
-        int i, shm_fd;
-
-        void * ptr;
-
-        shm_fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+        caddr_t ptr;
 
         if (shm_fd == 1) {
             
@@ -80,9 +82,9 @@ int main(int argc, char* argv[]){
             exit(1);
         }
 
-        ftruncate(shm_fd, sizeof(SIZE));
+        ftruncate(shm_fd, SIZE*sizeof(int));
 
-        ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+        ptr = mmap(0, SIZE, PROT_WRITE, MAP_SHARED, shm_fd, 0);
 
         if (ptr == MAP_FAILED) {
             
@@ -93,9 +95,6 @@ int main(int argc, char* argv[]){
         /* Write into the memory segment */
 
         // implement logic of sempahores and ring buffer
-
-        int in = 0; //index at which producer will put the next data
-        int out = 0; // index from which the consumer will consume next data
 
         int Prod[SIZE];
 
@@ -109,17 +108,17 @@ int main(int argc, char* argv[]){
 
         write(fd_time0, &time_taken0, sizeof(time_taken0));
 
-        while(in < num){
+        int in; //index at which producer will put the next data
+
+        for(in = 0; in < num; in ++){
 
             // produce an item
 
-            int item = 1 + rand()%100;
+            Prod[in % SIZE] = 1 + rand()%100;
 
             sem_wait(&not_full); // wait/sleep when there are no empty slots
 
-            Prod[in] = item;
-
-            in = (in+1)%SIZE;
+            ptr[in % SIZE] = Prod[in % SIZE];
             
             sem_post(&not_empty); // Signal/wake to consumer that buffer has some   data and they can consume now
         }
@@ -129,11 +128,9 @@ int main(int argc, char* argv[]){
 
     else{
 
-        const char * shm_name = "/AOS";
+        int i;
 
-        int i, shm_fd;
-
-        void * ptr;
+        caddr_t ptr;
 
         shm_fd = shm_open(shm_name, O_RDONLY, 0666);
 
@@ -151,25 +148,24 @@ int main(int argc, char* argv[]){
             return 1;
         }
 
-        int in = 0; //index at which producer will put the next data
-        int out = 0; // index from which the consumer will consume next data
 
-        int Prod[SIZE];
+        int Cons[SIZE];
         int item;
 
         fd_time1 = open(argv[2], O_WRONLY);
 
-        while(out < num){
+        int out; // index from which the consumer will consume next data
 
-            sem_wait(&not_empty); // wait/sleep when there are no full slots
-           
-            item = Prod[out];
+        for(out = 0; out < num; out ++){
 
-            out = (out+1)%SIZE;
+
+            sem_wait(&not_empty); // wait/sleep when there are no empty slots
+
+            Cons[out % SIZE] =  ptr[out % SIZE];
             
-            sem_post(&not_full); // Signal/wake the producer that buffer slots are emptied and they can produce more
-            //consumer the item
+            sem_post(&not_full); // Signal/wake to consumer that buffer has some   data and they can consume now
         }
+
 
         if (shm_unlink(shm_name) == 1) {
 
@@ -189,6 +185,9 @@ int main(int argc, char* argv[]){
     close(fd_time0);
     close(fd_time1);
 
+    sem_destroy(&not_empty);
+    sem_destroy(&not_full);
+    
     return 0;
 }
 

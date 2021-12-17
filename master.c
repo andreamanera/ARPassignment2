@@ -100,6 +100,7 @@ int main(){
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
 				printf("Time of execution : %f\n", tot);
+				printf("\n");
                 fflush(stdout);
             break;
 
@@ -111,6 +112,7 @@ int main(){
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
 				printf("Time of execution : %f\n", tot);
+				printf("\n");
 				fflush(stdout);
                 
             break;
@@ -123,6 +125,7 @@ int main(){
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
 				printf("Time of execution : %f\n", tot);
+				printf("\n");
 				fflush(stdout);
                
             break;
@@ -135,6 +138,7 @@ int main(){
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
 				printf("Time of execution : %f\n", tot);
+				printf("\n");
 				fflush(stdout);
 
             break;
