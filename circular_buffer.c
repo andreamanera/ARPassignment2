@@ -23,6 +23,7 @@
 #include <sys/shm.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <pthread.h>
 
 #define SIZE 2000000
 
@@ -53,20 +54,23 @@ int main(int argc, char* argv[]){
 
     sem_t not_full;
     sem_t not_empty;
+    pthread_mutex_t mutex;
 
     /* Initialize not_full semaphore to a count of BUFFER_SIZE */
 
-    sem_init(&not_full, 1, SIZE);
+    sem_init(&not_full, 0, SIZE);
 
     /* Initialize not_empty semaphore to a count of 0 */
 
-    sem_init(&not_empty, 1, 0);
+    sem_init(&not_empty, 0, 0);
 
     
 
     const char * shm_name = "/AOS";
 
     int shm_fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+
+    int buf[SIZE];
 
     int id = fork();
 
@@ -96,8 +100,6 @@ int main(int argc, char* argv[]){
 
         // implement logic of sempahores and ring buffer
 
-        int Prod[SIZE];
-
         fd_time0 = open(argv[1], O_WRONLY);
 
         seconds0 = clock();
@@ -108,19 +110,28 @@ int main(int argc, char* argv[]){
 
         write(fd_time0, &time_taken0, sizeof(time_taken0));
 
-        int in; //index at which producer will put the next data
+        int in = 0; //index at which producer will put the next data
 
-        for(in = 0; in < num; in ++){
+        int count = 0;
+
+        while(count < num){
 
             // produce an item
 
-            Prod[in % SIZE] = 1 + rand()%100;
-
             sem_wait(&not_full); // wait/sleep when there are no empty slots
+            pthread_mutex_lock(&mutex);
 
-            ptr[in % SIZE] = Prod[in % SIZE];
+            int item = 1 + rand()%100;
+
+            buf[in] = item;
+
+            in = (in+1) % SIZE;
+
+            count++;
             
+            pthread_mutex_unlock(&mutex);
             sem_post(&not_empty); // Signal/wake to consumer that buffer has some   data and they can consume now
+            
         }
 
         munmap(ptr, SIZE);
@@ -154,15 +165,28 @@ int main(int argc, char* argv[]){
 
         fd_time1 = open(argv[2], O_WRONLY);
 
-        int out; // index from which the consumer will consume next data
+        int out = 0; // index from which the consumer will consume next data
 
-        for(out = 0; out < num; out ++){
+        int count = 0;
 
+        while(count < num){
 
             sem_wait(&not_empty); // wait/sleep when there are no empty slots
+            pthread_mutex_lock(&mutex);
 
-            Cons[out % SIZE] =  ptr[out % SIZE];
+            printf("aaa");
+
+            fflush(stdout);
+
+            int item;
+
+            item = buf[out];
+
+            out = (out + 1) % SIZE;
+
+            count++;
             
+            pthread_mutex_unlock(&mutex);
             sem_post(&not_full); // Signal/wake to consumer that buffer has some   data and they can consume now
         }
 
@@ -187,6 +211,8 @@ int main(int argc, char* argv[]){
 
     sem_destroy(&not_empty);
     sem_destroy(&not_full);
+
+    pthread_mutex_destroy(&mutex);
     
     return 0;
 }
