@@ -11,22 +11,27 @@
 #include <time.h>
 #include <termios.h>
 
+#define BYEL "\e[1;33m"
+#define RESET "\e[0m"
+#define RED "\e[0;31m"
 #define SIZE 2000000
 
 int main(int argc, char* argv[]){
 
     int fd_time0;
     int fd_time1;
+
     clock_t seconds0;
     clock_t seconds1;
 
     int p[2];
   
     if (pipe(p) < 0){
+
         exit(1);
     }
-
-    printf("Insert size of the array (in kB), max size is 100000 kB\n");
+    
+    printf(BYEL "Enter the amount of kB you want to transfer (maximum quantity is 100000 kB)" RESET "\n");
 
     int kBsize;
 
@@ -34,26 +39,31 @@ int main(int argc, char* argv[]){
 
     while (kBsize > 100000){
 
-        printf("Insert a number smaller than 100");
+        printf(RED "ENTER AN AMOUNT OF KB LESS THAN 10000" RESET "\n");
 
         scanf("%d", & kBsize);
-
     }
 
     int num = kBsize / 0.004;
 
     int id = fork();
 
+    if (id == -1){
+
+        printf("Error forking...\n");
+        exit(1);
+    }
+
     if (id != 0){
 
-        printf("Producer!\n");
-
         int A[SIZE];
+
         for(int i = 0; i < SIZE; i++){
 
             A[i] = 1 + rand()%100;
 
         }
+
         fd_time0 = open(argv[1], O_WRONLY);
 
         seconds0 = clock();
@@ -72,8 +82,6 @@ int main(int argc, char* argv[]){
 
     else{
 
-        printf("Consumer!\n");
-
         fd_time1 = open(argv[2], O_WRONLY);
 
         int B[SIZE];
@@ -81,7 +89,6 @@ int main(int argc, char* argv[]){
         for(int i = 0; i < num; i++){
 
             read(p[0], &B[i%SIZE], sizeof(B[i%SIZE]));
-
         }
 
         seconds1 = clock();
@@ -91,8 +98,8 @@ int main(int argc, char* argv[]){
         printf("Time 1 : %f\n", time_taken1);
 
         write(fd_time1, &time_taken1, sizeof(time_taken1));
-
     }
+
     close(fd_time0);
     close(fd_time1);
 

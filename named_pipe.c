@@ -11,17 +11,22 @@
 #include <time.h>
 #include <termios.h>
 
+#define BLU "\e[0;34m"
+#define RESET "\e[0m"
+#define RED "\e[0;31m"
 #define SIZE 2000000
 
 int main(int argc, char* argv[]){
 
     int fd_np;
+
     int fd_time0;
     int fd_time1;
+
     clock_t seconds0;
     clock_t seconds1;
 
-    printf("Insert size of the array (in kB), max size is 100000 kB\n");
+    printf(BLU "Enter the amount of kB you want to transfer (maximum quantity is 100000 kB)" RESET "\n");
 
     int kBsize;
 
@@ -29,7 +34,7 @@ int main(int argc, char* argv[]){
 
     while (kBsize > 100000){
 
-        printf("Insert a number smaller than 100");
+        printf(RED "ENTER AN AMOUNT OF KB LESS THAN 10000" RESET "\n");
 
         scanf("%d", & kBsize);
 
@@ -47,8 +52,6 @@ int main(int argc, char* argv[]){
 
     if (id != 0){
 
-        printf("Producer!\n");
-
         //maximum size of array that can occupy memory without segmentation fault
 
         int A[SIZE];
@@ -56,7 +59,6 @@ int main(int argc, char* argv[]){
         for(int i = 0; i < SIZE; i++){
 
             A[i] = 1 + rand()%100;
-
         }
 
         fd_np = open(argv[1], O_WRONLY);
@@ -80,8 +82,6 @@ int main(int argc, char* argv[]){
     }
 
     else{
-
-        printf("Consumer!\n");
             
         fd_np = open(argv[1], O_RDONLY);
 
@@ -92,7 +92,6 @@ int main(int argc, char* argv[]){
         for(int i = 0; i < num; i++){
 
             read(fd_np, &B[i%SIZE], sizeof(B[i%SIZE]));
-
         }
 
         // Stores time seconds
@@ -104,9 +103,6 @@ int main(int argc, char* argv[]){
         printf("Time 1 : %f\n", time_taken1);
 
         write(fd_time1, &time_taken1, sizeof(time_taken1));
-        
-        
-
     }
     
     close(fd_np);

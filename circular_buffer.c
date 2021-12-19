@@ -21,6 +21,9 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#define CYN "\e[0;36m"
+#define RESET "\e[0m"
+#define RED "\e[0;31m"
 #define ERROR_CHAR (-1)
 #define TRUE 1
 #define FALSE 0
@@ -32,39 +35,38 @@ int main(int argc, char* argv[]){
 
     int fd_time0;
     int fd_time1;
+    int kBsize;
+    int i;
+    int shmid;
     
     clock_t seconds0;
     clock_t seconds1;
 
-    printf("Insert size of the array (in kB), max size is 100000 kB\n");
-
-    int kBsize;
+    printf(CYN "Enter the amount of kB you want to transfer (maximum quantity is 100000 kB)" RESET "\n");
 
     scanf("%d", & kBsize);
 
     while (kBsize > 100000){
 
-        printf("Insert a number smaller than 100000");
+        printf(RED "ENTER AN AMOUNT OF KB LESS THAN 10000" RESET "\n");
 
         scanf("%d", & kBsize);
-
     }
 
     int num = kBsize / 0.004;
 
-    typedef struct
-    {
+    typedef struct{
+
         char file_path[SIZE];
         int in;
         int out;
         sem_t full;
         sem_t empty;
         sem_t mutex;
+
     } Buffer;
 
     Buffer *ptr;
-
-    int shmid;
 
     /* shmid is the id of the shared memory address for our buffer */
 
@@ -87,12 +89,16 @@ int main(int argc, char* argv[]){
     // fork
 
     int id = fork();
-    
+
+    if (id == -1){
+
+        printf("Error forking...\n");
+        exit(1);
+    }
+
     if (id != 0){
 
         /* this is the producer process */
-
-        int i;
 
         fd_time0 = open(argv[1], O_WRONLY);
 
@@ -112,7 +118,7 @@ int main(int argc, char* argv[]){
 
             sem_wait(&ptr->empty);
 
-            ptr->file_path[ptr->in] = 1 + rand()%100; 
+            ptr->file_path[ptr->in] = 1 + rand()%100;; 
             ptr->in = (ptr->in + 1)%SIZE;
 
             sem_post(&ptr->full);

@@ -16,6 +16,9 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
+#define MAG "\e[0;35m"
+#define RESET "\e[0m"
+#define RED "\e[0;31m"
 #define SIZE 2000000
 
 void error(char *msg){
@@ -28,7 +31,6 @@ int main(int argc, char* argv[]){
 
     int fd_time0;
     int fd_time1;
-
     int sockfd;
     int newsockfd;
     int portno;
@@ -36,13 +38,12 @@ int main(int argc, char* argv[]){
 
     struct sockaddr_in serv_addr;
     struct sockaddr_in cli_addr; 
-
     struct hostent *server;
 
     clock_t seconds0;
     clock_t seconds1;
 
-    printf("Insert size of the array (in kB), max size is 100000 kB\n");
+     printf(MAG "Enter the amount of kB you want to transfer (maximum quantity is 100000 kB)" RESET "\n");
 
     int kBsize;
 
@@ -50,10 +51,9 @@ int main(int argc, char* argv[]){
 
     while (kBsize> 100000){
 
-        printf("Insert a number smaller than 100000");
+        printf(RED "ENTER AN AMOUNT OF KB LESS THAN 10000" RESET "\n");
 
         scanf("%d", & kBsize);
-
     }
 
     int num = kBsize / 0.004;
@@ -68,14 +68,11 @@ int main(int argc, char* argv[]){
 
     if (id != 0){
 
-        printf("Server!\n");
-
         int A[SIZE];
 
         for(int i = 0; i < SIZE; i++){
 
             A[i] = 1 + rand()%100;
-
         }
 
         fd_time0 = open(argv[1], O_WRONLY);
@@ -115,6 +112,7 @@ int main(int argc, char* argv[]){
         serv_addr.sin_addr.s_addr = INADDR_ANY;
 
         int reuse = 1;
+
         if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)) < 0){
 
             perror("setsockopt(SO_REUSEADDR) failed");
@@ -151,15 +149,13 @@ int main(int argc, char* argv[]){
 
     else{
 
-        printf("Client!\n");
-
         fd_time1 = open(argv[2], O_WRONLY);
 
         int B[SIZE];
 
         if (argc < 3) {
 
-            exit(0);
+            exit(1);
         }
 
         portno = 8080;

@@ -10,11 +10,23 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <time.h>
-#include <termios.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+
+#define UGRN "\e[4;32m"
+#define BHRED "\e[1;91m"
+#define BHYEL "\e[1;93m"
+#define BHBLU "\e[1;94m"
+#define BHMAG "\e[1;95m"
+#define BHCYN "\e[1;96m"
+#define RESET "\e[0m"
+#define UYEL "\e[4;33m"
+#define UBLU "\e[4;34m"
+#define UMAG "\e[4;35m"
+#define UCYN "\e[4;36m"
+#define BHWHT "\e[1;97m"
 
 int spawn(const char * program, char ** arg_list) {
 
@@ -71,21 +83,25 @@ int main(){
 	mkfifo("/tmp/np", 0666);
 	mkfifo("/tmp/time0", 0666);
 	mkfifo("/tmp/time1", 0666);
+
 	char *arg_list_np[] = { "./np", "/tmp/np", "/tmp/time0",  "/tmp/time1", NULL };
 	char *arg_list_up[] = { "./up", "/tmp/time0",  "/tmp/time1", NULL };
 	char *arg_list_sck[] = { "./sck", "/tmp/time0",  "/tmp/time1", NULL };
 	char *arg_list_cb[] = { "./cb", "/tmp/time0",  "/tmp/time1", NULL };
 
+	printf("\n");
+	printf(BHWHT "These 4 concurrents programs aim to measure the speed efficiency when transferring data between a producer and a consumer using different models. The project was made by Lorenzo Benedetti and Andrea G.P. Manera" RESET "\n");
+	printf("\n");
 
 	char c;
 	 
     while (c != 'e'){
 
-		printf("chose which IPC you want to use\n");
-		printf("press U for unnamed pipe\n");
-		printf("press N for named pipe\n");
-		printf("press S for socket\n");
-		printf("press C for circular buffer\n");
+		printf(UGRN "Select which IPC you want to use in order to transfer data:" RESET "\n");
+		printf(BHYEL "Press U for Unnamed Pipe transferring" RESET "\n");
+		printf(BHBLU "Press N for Named Pipe transferring" RESET "\n");
+		printf(BHMAG "Press S for Socket transferring" RESET "\n");
+		printf(BHCYN "Press C for Circular Buffer transferring" RESET "\n");
 
 		c = getchar();
 		getchar();
@@ -99,7 +115,7 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf("Time of execution : %f\n", tot);
+				printf(UYEL "Time taken for the transfer of the kB amount chosen : %f" RESET "\n", tot);
 				printf("\n");
                 fflush(stdout);
             break;
@@ -111,10 +127,9 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf("Time of execution : %f\n", tot);
+				printf(UBLU "Time taken for the transfer of the kB amount chosen : %f" RESET "\n", tot);
 				printf("\n");
 				fflush(stdout);
-                
             break;
 
             case 115:
@@ -124,10 +139,9 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf("Time of execution : %f\n", tot);
+				printf(UMAG "Time taken for the transfer of the kB amount chosen : %f" RESET "\n", tot);
 				printf("\n");
 				fflush(stdout);
-               
             break;
 
             case 99:
@@ -137,17 +151,13 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf("Time of execution : %f\n", tot);
+				printf(UCYN "Time taken for the transfer of the kB amount chosen : %f" RESET "\n", tot);
 				printf("\n");
 				fflush(stdout);
-
-            break;
+			break;
 		}
-
-		
 	}
 
-return 0;
-
+	return 0;
 }
 
