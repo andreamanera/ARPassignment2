@@ -90,7 +90,7 @@ int main(){
 	char *arg_list_cb[] = { "./cb", "/tmp/time0",  "/tmp/time1", NULL };
 
 	printf("\n");
-	printf(BHWHT "These 4 concurrents programs aim to measure the speed efficiency when transferring data between a producer and a consumer using different models. The project was made by Lorenzo Benedetti and Andrea G.P. Manera." RESET "\n");
+	printf(BHWHT "These 4 concurrents programs aim to measure the speed efficiency when transfer data between a producer and a consumer using different models. The project was made by Lorenzo Benedetti and Andrea G.P. Manera." RESET "\n");
 	printf("\n");
 
 	char c;
@@ -98,10 +98,10 @@ int main(){
     while (c != 'e'){
 
 		printf(UGRN "Select which IPC you want to use in order to transfer data:" RESET "\n");
-		printf(BHYEL "Press U for Unnamed Pipe transferring" RESET "\n");
-		printf(BHBLU "Press N for Named Pipe transferring" RESET "\n");
-		printf(BHMAG "Press S for Socket transferring" RESET "\n");
-		printf(BHCYN "Press C for Circular Buffer transferring" RESET "\n");
+		printf(BHYEL "Press U for Unnamed Pipe transfer" RESET "\n");
+		printf(BHBLU "Press N for Named Pipe transfer" RESET "\n");
+		printf(BHMAG "Press S for Socket transfer" RESET "\n");
+		printf(BHCYN "Press C for Circular Buffer transfer" RESET "\n");
 		printf(BHRED "Press E if you want to EXIT" RESET "\n");
 
 		c = getchar();
@@ -165,4 +165,3 @@ int main(){
 
 	return 0;
 }
-
