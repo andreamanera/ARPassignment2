@@ -90,7 +90,7 @@ int main(){
 	char *arg_list_cb[] = { "./cb", "/tmp/time0",  "/tmp/time1", NULL };
 
 	printf("\n");
-	printf(BHWHT "These 4 concurrents programs aim to measure the speed efficiency when transferring data between a producer and a consumer using different models. The project was made by Lorenzo Benedetti and Andrea G.P. Manera" RESET "\n");
+	printf(BHWHT "These 4 concurrents programs aim to measure the speed efficiency when transferring data between a producer and a consumer using different models. The project was made by Lorenzo Benedetti and Andrea G.P. Manera." RESET "\n");
 	printf("\n");
 
 	char c;
@@ -102,6 +102,7 @@ int main(){
 		printf(BHBLU "Press N for Named Pipe transferring" RESET "\n");
 		printf(BHMAG "Press S for Socket transferring" RESET "\n");
 		printf(BHCYN "Press C for Circular Buffer transferring" RESET "\n");
+		printf(BHRED "Press E if you want to EXIT" RESET "\n");
 
 		c = getchar();
 		getchar();
@@ -155,6 +156,10 @@ int main(){
 				printf("\n");
 				fflush(stdout);
 			break;
+
+			default:
+				printf(BHRED "Wrong command, try again!" RESET "\n");
+				printf("\n");
 		}
 	}
 
