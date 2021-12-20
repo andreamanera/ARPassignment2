@@ -116,7 +116,7 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf(UYEL "Time taken for the transfer of the kB amount chosen : %f" RESET "\n", tot);
+				printf(UYEL "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
                 fflush(stdout);
             break;
@@ -128,7 +128,7 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf(UBLU "Time taken for the transfer of the kB amount chosen : %f" RESET "\n", tot);
+				printf(UBLU "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
 				fflush(stdout);
             break;
@@ -140,7 +140,7 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf(UMAG "Time taken for the transfer of the kB amount chosen : %f" RESET "\n", tot);
+				printf(UMAG "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
 				fflush(stdout);
             break;
@@ -152,9 +152,13 @@ int main(){
 				fd_time1 = open("/tmp/time1", O_RDONLY);
 				read(fd_time1, &seconds1, sizeof(seconds1));
 				tot = seconds1 - seconds0;
-				printf(UCYN "Time taken for the transfer of the kB amount chosen : %f" RESET "\n", tot);
+				printf(UCYN "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
 				fflush(stdout);
+			break;
+
+			case 101:
+
 			break;
 
 			default:

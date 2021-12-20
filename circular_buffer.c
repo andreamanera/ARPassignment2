@@ -114,12 +114,12 @@ int main(int argc, char* argv[]){
 
         while(a < num){
 
-            a++;
-
             sem_wait(&ptr->empty);
 
             ptr->file_path[ptr->in] = 1 + rand()%100;; 
             ptr->in = (ptr->in + 1)%SIZE;
+
+            a++;
 
             sem_post(&ptr->full);
         }
@@ -133,12 +133,12 @@ int main(int argc, char* argv[]){
 
         while (b < num){
 
-            b++;
-
             sem_wait(&ptr->full);
 
             int h = ptr->file_path[ptr->out];
             ptr->out = (ptr->out + 1)%SIZE;
+
+            b++;
 
             sem_post(&ptr->empty);
         }
