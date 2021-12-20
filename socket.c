@@ -120,18 +120,6 @@ int main(int argc, char* argv[]){
         // To convert the number of CPU clock cycles into seconds, we need to use the CLOCKS_PER_SEC constant, which is also defined in the time.h header.
         // We send the time through a named pipe.
 
-        fd_time0 = open(argv[1], O_WRONLY);
-
-        // Stores time in seconds
-
-        seconds0 = clock();
-
-        double time_taken0 =(double) seconds0 / CLOCKS_PER_SEC;
-
-        printf("Time 0 : %f\n", time_taken0);
-
-        write(fd_time0, &time_taken0, sizeof(time_taken0));
-
         if(argc < 2){
 
             fprintf(stderr, "Error, no port provided\n");
@@ -215,7 +203,7 @@ int main(int argc, char* argv[]){
         // type sockaddr , but what is passed in is a structure of type sockaddr_in , and so this must be cast to the
         // correct type. This can fail for a number of reasons, the most obvious being that this socket is already in us on this machine.
 
-        if(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
+        if(bind(sockfd, &serv_addr, sizeof(serv_addr)) < 0){
 
             error("Error on binding\n");
         }
@@ -247,6 +235,19 @@ int main(int argc, char* argv[]){
         // everything written by the client will be read by the server, and everything written by the server will be read
         // by the client. This code simply writes a short message to the client. The last argument of write is the size of the message.
 
+
+        fd_time0 = open(argv[1], O_WRONLY);
+
+        // Stores time in seconds
+
+        seconds0 = clock();
+
+        double time_taken0 =(double) seconds0 / CLOCKS_PER_SEC;
+
+        printf("Time 0 : %f\n", time_taken0);
+
+        write(fd_time0, &time_taken0, sizeof(time_taken0));
+
         // Writing to the consumer through the server-client type. Since more than 2000000 integers
         // could be transferred, but the array can only handles 2000000 of them, we have devised a system
         // thanks to which we will send the amount of integers we want up to 25000000 (100 MB).
@@ -255,6 +256,8 @@ int main(int argc, char* argv[]){
 
             write(newsockfd, &A[i%SIZE], sizeof(A[i%SIZE]));
         }
+
+        printf("\n");
     }
 
     else{
@@ -318,6 +321,8 @@ int main(int argc, char* argv[]){
         for(int i = 0; i < num; i++){
 
             read(sockfd, &B[i%SIZE], sizeof(B[i%SIZE]));
+
+            printf("%d\n", B[i]);
         }
 
         // Taking the time in which the consumer finishes reading the data from the producer process (father)

@@ -104,8 +104,12 @@ int main(){
 		printf(BHCYN "Press C for Circular Buffer transfer" RESET "\n");
 		printf(BHRED "Press E if you want to EXIT" RESET "\n");
 
+		system ("/bin/stty raw");
+
 		c = getchar();
-		getchar();
+		printf("\n");
+		
+		system ("/bin/stty cooked");
 
         switch(c){
 

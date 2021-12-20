@@ -3,11 +3,6 @@
 #include <strings.h>
 #include <sys/wait.h>
 #include <time.h>
-#include <termios.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <arpa/inet.h>
 #include <sys/mman.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +14,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <pthread.h>
 
 #define CYN "\e[0;36m"
 #define RESET "\e[0m"
