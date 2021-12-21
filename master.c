@@ -78,6 +78,14 @@ int spawn(const char * program, char ** arg_list) {
 
 int main(){
 
+	FILE *out = fopen("logfile.txt", "w");
+    if(out == NULL){
+
+        printf("Error opening FILE");
+    }
+	
+	fclose(out);
+
     // Declaring all necessary PIDs
 
     pid_t pid_unpipe;
@@ -88,6 +96,8 @@ int main(){
 
 	int fd_time0;
 	int fd_time1;
+
+	time_t current_time;
 
 	double seconds0;
     double seconds1;
@@ -111,6 +121,12 @@ int main(){
 	printf(BHWHT "These 4 concurrents programs aim to measure the speed efficiency when transfer data between a producer and a consumer using different models. The project was made by Lorenzo Benedetti and Andrea G.P. Manera." RESET "\n");
 	printf("\n");
 
+	FILE *out2 = fopen("logfile.txt", "a");
+    if(out2 == NULL){
+
+        printf("Error opening FILE");
+    }
+	
 	char c;
 	 
     while (c != 'e'){
@@ -129,10 +145,14 @@ int main(){
 		
 		system ("/bin/stty cooked");
 
+		time(&current_time);
+
         switch(c){
 
             case 117:
                 pid_unpipe = spawn ("./up", arg_list_up);
+				fprintf(out2, "UNNAMED PIPE SELECTED    Time:  %s", ctime(&current_time));
+                fflush(out2);
                 CHECK(fd_time0 = open("/tmp/time0", O_RDONLY));
 				CHECK(read(fd_time0, &seconds0, sizeof(seconds0)));
 				CHECK(fd_time1 = open("/tmp/time1", O_RDONLY));
@@ -140,11 +160,16 @@ int main(){
 				tot = seconds1 - seconds0;
 				printf(UYEL "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
+				fprintf(out2, "TIME TAKEN TO TRANSFER DATA:  %f", tot);
+				fprintf(out2, "\n");
+                fflush(out2);
                 fflush(stdout);
             break;
 
             case 110:
                 pid_npipe = spawn ("./np", arg_list_np);
+				fprintf(out2, "NAMED PIPE SELECTED    Time:  %s", ctime(&current_time));
+                fflush(out2);
 				CHECK(fd_time0 = open("/tmp/time0", O_RDONLY));
 				CHECK(read(fd_time0, &seconds0, sizeof(seconds0)));
 				CHECK(fd_time1 = open("/tmp/time1", O_RDONLY));
@@ -152,11 +177,16 @@ int main(){
 				tot = seconds1 - seconds0;
 				printf(UBLU "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
+				fprintf(out2, "TIME TAKEN TO TRANSFER DATA:  %f", tot);
+				fprintf(out2, "\n");
+                fflush(out2);
 				fflush(stdout);
             break;
 
             case 115:
                 pid_socket = spawn ("./sck", arg_list_sck);
+				fprintf(out2, "SOCKET SELECTED    Time:  %s", ctime(&current_time));
+                fflush(out2);
 				CHECK(fd_time0 = open("/tmp/time0", O_RDONLY));
 				CHECK(read(fd_time0, &seconds0, sizeof(seconds0)));
 				CHECK(fd_time1 = open("/tmp/time1", O_RDONLY));
@@ -164,11 +194,16 @@ int main(){
 				tot = seconds1 - seconds0;
 				printf(UMAG "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
+				fprintf(out2, "TIME TAKEN TO TRANSFER DATA:  %f", tot);
+				fprintf(out2, "\n");
+                fflush(out2);
 				fflush(stdout);
             break;
 
             case 99:
                 pid_circb = spawn ("./cb", arg_list_cb);
+				fprintf(out2, "CIRCULAR BUFFER SELECTED    Time:  %s", ctime(&current_time));
+                fflush(out2);
 				CHECK(fd_time0 = open("/tmp/time0", O_RDONLY));
 				CHECK(read(fd_time0, &seconds0, sizeof(seconds0)));
 				CHECK(fd_time1 = open("/tmp/time1", O_RDONLY));
@@ -176,18 +211,27 @@ int main(){
 				tot = seconds1 - seconds0;
 				printf(UCYN "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
+				fprintf(out2, "TIME TAKEN TO TRANSFER DATA:  %f s", tot);
+				fprintf(out2, "\n");
+                fflush(out2);
 				fflush(stdout);
 			break;
 
 			case 101:
-
+				fprintf(out2, "EXIT SELECTED    Time:  %s", ctime(&current_time));
+                fflush(out2);
 			break;
 
 			default:
 				printf(BHRED "Wrong command, try again!" RESET "\n");
 				printf("\n");
+				fprintf(out2, "WRONG COMMAND SELECTED    Time:  %s", ctime(&current_time));
+				fprintf(out2, "\n");
+                fflush(out2);
 		}
 	}
+
+	CHECK(fclose(out2));
 
 	return 0;
 }

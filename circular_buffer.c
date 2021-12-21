@@ -176,7 +176,7 @@ int main(int argc, char* argv[]){
     CHECK(shmctl(shmid, IPC_RMID, 0));
 
     close(fd_time1); // il CHECK da un errore, non capisco
-    CHECK(close(fd_time0));
+    close(fd_time0);//idem come sopra
     
     /* finally, close the signature file */
 
