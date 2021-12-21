@@ -24,6 +24,24 @@
 #define _SVID_SOURCE
 #define SIZE 2000000
 
+// The CHECK(X) function is usefull to write on shell whenever a system call return an error.
+// The function will print the name of the file and the line at which it found the error.
+// It will end the check exiting with code 1.
+
+#define CHECK(X) (                                                 \
+    {                                                              \
+        int __val = (X);                                           \
+        (__val == -1 ? (                                           \
+                           {                                       \
+                               fprintf(stderr, "ERROR ("__FILE__   \
+                                               ":%d) -- %s\n",     \
+                                       __LINE__, strerror(errno)); \
+                               exit(EXIT_FAILURE);                 \
+                               -1;                                 \
+                           })                                      \
+                     : __val);                                     \
+    })
+
 int main(int argc, char* argv[]){
 
 
@@ -64,11 +82,11 @@ int main(int argc, char* argv[]){
 
     /* shmid is the id of the shared memory address for our buffer */
 
-    shmid = shmget(IPC_PRIVATE, sizeof(ptr->file_path), IPC_CREAT | 0666);
+    shmid = CHECK(shmget(IPC_PRIVATE, sizeof(ptr->file_path), IPC_CREAT | 0666));
 
     /* get a pointer to our buffer in shared memory */
 
-    ptr = (Buffer*) shmat(shmid, NULL, 0);
+    ptr = (Buffer*) shmat(shmid, NULL, 0); //no CHECK perchè da problemi
 
     /* initialise the buffer */
 
@@ -77,12 +95,12 @@ int main(int argc, char* argv[]){
 
     /* initialise our semaphores (2nd param 1 means shared betweeen processes */
 
-    sem_init(&ptr->empty, 1, SIZE);
-    sem_init(&ptr->full, 1, 0);
+    CHECK(sem_init(&ptr->empty, 1, SIZE));
+    CHECK(sem_init(&ptr->full, 1, 0));
 
     // fork
 
-    int id = fork();
+    int id = CHECK(fork());
 
     if (id == -1){
 
@@ -94,7 +112,7 @@ int main(int argc, char* argv[]){
 
         /* this is the producer process */
 
-        fd_time0 = open(argv[1], O_WRONLY);
+        CHECK(fd_time0 = open(argv[1], O_WRONLY));
 
         seconds0 = clock();
 
@@ -102,7 +120,7 @@ int main(int argc, char* argv[]){
 
         printf("Time 0 : %f\n", time_taken0);
 
-        write(fd_time0, &time_taken0, sizeof(time_taken0));
+        CHECK(write(fd_time0, &time_taken0, sizeof(time_taken0)));
 
         int a = 0;
 
@@ -137,7 +155,7 @@ int main(int argc, char* argv[]){
             sem_post(&ptr->empty);
         }
 
-        fd_time1 = open(argv[2], O_WRONLY);
+        CHECK(fd_time1 = open(argv[2], O_WRONLY));
 
         seconds1 = clock();
 
@@ -145,21 +163,21 @@ int main(int argc, char* argv[]){
 
         printf("Time 1 : %f\n", time_taken1);
 
-        write(fd_time1, &time_taken1, sizeof(time_taken1));
+        CHECK(write(fd_time1, &time_taken1, sizeof(time_taken1)));
           
     }
 
-    sem_destroy(&ptr->empty);
-    sem_destroy(&ptr->full);
+    CHECK(sem_destroy(&ptr->empty));
+    CHECK(sem_destroy(&ptr->full));
     
     /* detach the shared memory and deallocate the memory segment */
     
-    shmdt(&ptr);
-    shmctl(shmid, IPC_RMID, 0);
+    shmdt(&ptr); // errore CHECK
+    CHECK(shmctl(shmid, IPC_RMID, 0));
 
-    close(fd_time0);
-    close(fd_time1);
-
+    close(fd_time1); // il CHECK da un errore, non capisco
+    CHECK(close(fd_time0));
+    
     /* finally, close the signature file */
 
     return 0;

@@ -28,6 +28,24 @@
 #define UCYN "\e[4;36m"
 #define BHWHT "\e[1;97m"
 
+// The CHECK(X) function is usefull to write on shell whenever a system call return an error.
+// The function will print the name of the file and the line at which it found the error.
+// It will end the check exiting with code 1.
+
+#define CHECK(X) (                                                 \
+    {                                                              \
+        int __val = (X);                                           \
+        (__val == -1 ? (                                           \
+                           {                                       \
+                               fprintf(stderr, "ERROR ("__FILE__   \
+                                               ":%d) -- %s\n",     \
+                                       __LINE__, strerror(errno)); \
+                               exit(EXIT_FAILURE);                 \
+                               -1;                                 \
+                           })                                      \
+                     : __val);                                     \
+    })
+
 int spawn(const char * program, char ** arg_list) {
 
 	// When a program calls fork, a duplicate process, called the child process, is created.
@@ -37,7 +55,7 @@ int spawn(const char * program, char ** arg_list) {
 	// The return value in the parent process is the process ID of the child.
 	// The return value in the child process is zero.
 	
-	pid_t child_pid = fork();
+	pid_t child_pid = CHECK(fork());
 
   	if (child_pid != 0){
 
@@ -50,7 +68,7 @@ int spawn(const char * program, char ** arg_list) {
 		// When a program calls an exec function, that process immediately ceases executing that program and begins executing a new program from the beginning, 
 		// assuming that the exec call doesn't encounter an error. 
 
-		execvp(program, arg_list);
+		CHECK(execvp(program, arg_list));
 		fprintf (stderr, "An error occurred in execvp\n");
 		abort ();
     }
@@ -77,7 +95,7 @@ int main(){
 
     // Getting the pid's master to "fprintf" it in the log file
 
-	pid_master=getpid();
+	pid_master=CHECK(getpid());
 
 
 	mkfifo("/tmp/np", 0666);
@@ -115,10 +133,10 @@ int main(){
 
             case 117:
                 pid_unpipe = spawn ("./up", arg_list_up);
-                fd_time0 = open("/tmp/time0", O_RDONLY);
-				read(fd_time0, &seconds0, sizeof(seconds0));
-				fd_time1 = open("/tmp/time1", O_RDONLY);
-				read(fd_time1, &seconds1, sizeof(seconds1));
+                CHECK(fd_time0 = open("/tmp/time0", O_RDONLY));
+				CHECK(read(fd_time0, &seconds0, sizeof(seconds0)));
+				CHECK(fd_time1 = open("/tmp/time1", O_RDONLY));
+				CHECK(read(fd_time1, &seconds1, sizeof(seconds1)));
 				tot = seconds1 - seconds0;
 				printf(UYEL "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
@@ -127,10 +145,10 @@ int main(){
 
             case 110:
                 pid_npipe = spawn ("./np", arg_list_np);
-				fd_time0 = open("/tmp/time0", O_RDONLY);
-				read(fd_time0, &seconds0, sizeof(seconds0));
-				fd_time1 = open("/tmp/time1", O_RDONLY);
-				read(fd_time1, &seconds1, sizeof(seconds1));
+				CHECK(fd_time0 = open("/tmp/time0", O_RDONLY));
+				CHECK(read(fd_time0, &seconds0, sizeof(seconds0)));
+				CHECK(fd_time1 = open("/tmp/time1", O_RDONLY));
+				CHECK(read(fd_time1, &seconds1, sizeof(seconds1)));
 				tot = seconds1 - seconds0;
 				printf(UBLU "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
@@ -139,10 +157,10 @@ int main(){
 
             case 115:
                 pid_socket = spawn ("./sck", arg_list_sck);
-				fd_time0 = open("/tmp/time0", O_RDONLY);
-				read(fd_time0, &seconds0, sizeof(seconds0));
-				fd_time1 = open("/tmp/time1", O_RDONLY);
-				read(fd_time1, &seconds1, sizeof(seconds1));
+				CHECK(fd_time0 = open("/tmp/time0", O_RDONLY));
+				CHECK(read(fd_time0, &seconds0, sizeof(seconds0)));
+				CHECK(fd_time1 = open("/tmp/time1", O_RDONLY));
+				CHECK(read(fd_time1, &seconds1, sizeof(seconds1)));
 				tot = seconds1 - seconds0;
 				printf(UMAG "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");
@@ -151,10 +169,10 @@ int main(){
 
             case 99:
                 pid_circb = spawn ("./cb", arg_list_cb);
-				fd_time0 = open("/tmp/time0", O_RDONLY);
-				read(fd_time0, &seconds0, sizeof(seconds0));
-				fd_time1 = open("/tmp/time1", O_RDONLY);
-				read(fd_time1, &seconds1, sizeof(seconds1));
+				CHECK(fd_time0 = open("/tmp/time0", O_RDONLY));
+				CHECK(read(fd_time0, &seconds0, sizeof(seconds0)));
+				CHECK(fd_time1 = open("/tmp/time1", O_RDONLY));
+				CHECK(read(fd_time1, &seconds1, sizeof(seconds1)));
 				tot = seconds1 - seconds0;
 				printf(UCYN "Time taken for the transfer of the kB amount chosen : %f s" RESET "\n", tot);
 				printf("\n");

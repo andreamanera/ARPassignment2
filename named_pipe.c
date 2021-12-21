@@ -21,6 +21,24 @@
 #define RED "\e[0;31m"
 #define SIZE 2000000
 
+// The CHECK(X) function is usefull to write on shell whenever a system call return an error.
+// The function will print the name of the file and the line at which it found the error.
+// It will end the check exiting with code 1.
+
+#define CHECK(X) (                                                 \
+    {                                                              \
+        int __val = (X);                                           \
+        (__val == -1 ? (                                           \
+                           {                                       \
+                               fprintf(stderr, "ERROR ("__FILE__   \
+                                               ":%d) -- %s\n",     \
+                                       __LINE__, strerror(errno)); \
+                               exit(EXIT_FAILURE);                 \
+                               -1;                                 \
+                           })                                      \
+                     : __val);                                     \
+    })
+
 // Main in which we have developed the code
 
 int main(int argc, char* argv[]){
@@ -63,7 +81,7 @@ int main(int argc, char* argv[]){
 
     // Thanks to the fork() we have created the consumer and the producer without using 2 separate scripts
 
-    int id = fork();
+    int id = CHECK(fork());
 
     if (id == -1){
 
@@ -87,14 +105,14 @@ int main(int argc, char* argv[]){
 
         // Open the pipe for writing between the producer and consumer for transfer data
 
-        fd_np = open(argv[1], O_WRONLY);
+        CHECK(fd_np = open(argv[1], O_WRONLY));
 
         // Taking the time in which the producer start writing the data to the consumer process (child)
         // and sending directly to the master process that will compute the exact transfer time.
         // To convert the number of CPU clock cycles into seconds, we need to use the CLOCKS_PER_SEC constant, which is also defined in the time.h header.
         // We send the time through a named pipe.
 
-        fd_time0 = open(argv[2], O_WRONLY);
+        CHECK(fd_time0 = open(argv[2], O_WRONLY));
 
         // Stores time in seconds
 
@@ -102,7 +120,7 @@ int main(int argc, char* argv[]){
 
         double time_taken0 =(double) seconds0 / CLOCKS_PER_SEC;
 
-        write(fd_time0, &time_taken0, sizeof(time_taken0));
+        CHECK(write(fd_time0, &time_taken0, sizeof(time_taken0)));
         
         printf("Time 0 : %f\n", time_taken0);
 
@@ -112,7 +130,7 @@ int main(int argc, char* argv[]){
 
         for(int i = 0; i < num ; i++){
 
-            write(fd_np, &A[i%SIZE], sizeof(A[i%SIZE]));
+           CHECK( write(fd_np, &A[i%SIZE], sizeof(A[i%SIZE])));
         }
     }
 
@@ -120,9 +138,9 @@ int main(int argc, char* argv[]){
 
         // Child process --> consumer
             
-        fd_np = open(argv[1], O_RDONLY);
+        CHECK(fd_np = open(argv[1], O_RDONLY));
 
-        fd_time1 = open(argv[3], O_WRONLY);
+        CHECK(fd_time1 = open(argv[3], O_WRONLY));
 
         // The child process will read the data transferred and we simply store them into
         // an array (not every data since the array at maximum has a size of 2000000)
@@ -131,7 +149,7 @@ int main(int argc, char* argv[]){
                     
         for(int i = 0; i < num; i++){
 
-            read(fd_np, &B[i%SIZE], sizeof(B[i%SIZE]));
+            CHECK(read(fd_np, &B[i%SIZE], sizeof(B[i%SIZE])));
         }
 
         // Taking the time in which the consumer finishes reading the data from the producer process (father)
@@ -145,14 +163,14 @@ int main(int argc, char* argv[]){
 
         printf("Time 1 : %f\n", time_taken1);
 
-        write(fd_time1, &time_taken1, sizeof(time_taken1));
+        CHECK(write(fd_time1, &time_taken1, sizeof(time_taken1)));
     }
 
     // Closing pipes
     
-    close(fd_np);
-    close(fd_time0);
-    close(fd_time1);
+    CHECK(close(fd_np));
+    CHECK(close(fd_time0));
+    CHECK(close(fd_time1));
 
     return 0;
 }
