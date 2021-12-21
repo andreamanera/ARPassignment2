@@ -264,6 +264,8 @@ int main(int argc, char* argv[]){
 
             CHECK(write(newsockfd, &buffer[i%SIZE], sizeof(buffer[i%SIZE])));
         }
+
+        close(newsockfd);
     }
 
     else{
@@ -350,8 +352,6 @@ int main(int argc, char* argv[]){
 
     CHECK(close(fd_time0));
     CHECK(close(fd_time1));
-
-    close(newsockfd);
 
     //non so se ci siano dei comandi per chiudere socket
 
