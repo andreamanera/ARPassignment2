@@ -1,0 +1,43 @@
+##########################################INFO##########################################
+--------------------ADVANCED AND ROBOT PROGRAMMING SECOND ASSIGNMENT--------------------
+
+info.txt file contains useful informations about the project.
+
+Andrea Manera (4668710)
+Lorenzo Benedetti (4679798)
+
+Inside the .zip archive are contained five files, three shell scripts the
+sources.zip archive and the text file you are reading. In the sources archive
+you find 5 directories wich contain the .c file and also a .txt file with 
+informations about each process.
+
+First of all to unzip the sources archive and install the program using the command:
+
+source ./install.sh <pathname>
+
+It will create a folder called <pathname> inside which are located the folders that
+were in sources.zip, there will also be a folder with the executables of each process.
+
+After that run the program with the command:
+
+./run.sh
+
+The second assignment is collection of 4 concurrent programs, whose aim is to measure the speed
+efficiency when transferring data between a producer and a consumer using different models.
+
+The four programs are based on a specific IPC transfer primitives, namely:
+1. unnamed pipe
+2. named pipe
+3. socket
+4. shared memory with circular buffer.
+
+Is also present another program wich is the master process useful to manage all other processes.
+
+-------------------------COMMON SPECIFICATIONS FOR ALL THE 4 PROGRAMS------------------------
+
+1. In the beginning, P (producer) fills an array A of random data
+2. C (conscumer) has an array B of same dimension of A
+3. C receives data and fills B
+4. The time spent in transfer is measured and reported
+5. The array dimension can be chosen by the user at any run (a maximum value of about 100
+   MB is imposed).
