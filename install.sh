@@ -56,7 +56,7 @@ gcc -o sck socket.c
 cd ..
 
 cd fcircularbuffer
-gcc -o cb circular_buffer.c
+gcc -o cb circular_buffer.c -lpthread -lrt
 cd ..
 
 cd fmaster
